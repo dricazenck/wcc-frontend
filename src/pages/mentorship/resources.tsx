@@ -7,7 +7,6 @@ import { Title, ResourcesCard, Footer, BreadCrumbsDynamic } from '@components';
 import { useIsMobile } from '@utils/theme-utils';
 import { FooterResponse, MentorshipResourcesResponse } from '@utils/types';
 import { fetchData } from 'lib/api';
-import footerData from 'lib/responses/footer.json';
 import pageData from 'lib/responses/mentorshipResources.json';
 
 type CombinedResponse = {
@@ -15,9 +14,18 @@ type CombinedResponse = {
   footer: FooterResponse;
 };
 
-const MentorshipResourcesPage: React.FC = () => {
+type MentorshipResourcesPageProps = {
+  data?: MentorshipResourcesResponse;
+  footer: FooterResponse;
+};
+
+const MentorshipResourcesPage: React.FC<MentorshipResourcesPageProps> = ({
+  data,
+  footer,
+}) => {
   const isMobile = useIsMobile();
-  const { heroTitle, heroDescription, resources } = pageData;
+  const page = (data ?? pageData) as MentorshipResourcesResponse;
+  const { heroSection, section, resourcesSection } = page;
 
   return (
     <>
@@ -27,8 +35,7 @@ const MentorshipResourcesPage: React.FC = () => {
         sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}
       >
         <Box sx={{ flexGrow: 1 }}>
-          <Title title={heroTitle} />
-
+          <Title title={heroSection.title} />
           <Box
             sx={{
               maxWidth: 800,
@@ -44,7 +51,7 @@ const MentorshipResourcesPage: React.FC = () => {
                 lineHeight: 1.5,
               }}
             >
-              {heroDescription}
+              {section.description}
             </Typography>
           </Box>
 
@@ -57,14 +64,14 @@ const MentorshipResourcesPage: React.FC = () => {
             }}
           >
             <Grid container spacing={4}>
-              {resources.map((res, index) => (
+              {resourcesSection.items.map((res, index) => (
                 <Grid item xs={12} sm={6} md={6} lg={4} key={index}>
                   <ResourcesCard
-                    image={res.image}
+                    image={res.image.path}
                     title={res.title}
-                    description={res.description}
-                    buttonText={res.buttonText}
-                    link={res.link}
+                    description={res.description ?? ''}
+                    buttonText={res.link.label}
+                    link={res.link.uri}
                     buttonIcon={<OpenInNewIcon />}
                   />
                 </Grid>
@@ -72,7 +79,7 @@ const MentorshipResourcesPage: React.FC = () => {
             </Grid>
           </Box>
         </Box>
-        <Footer {...footerData} />
+        <Footer {...footer} />
       </Box>
     </>
   );
@@ -84,9 +91,34 @@ export const getServerSideProps: GetServerSideProps = async () => {
       'mentorship/resources',
     );
 
+    const data = combinedResponse.data || pageData;
+
+    // fix images path
+    const resourcesItems = data.resourcesSection.items.map((item) => {
+      if (item.image.path.includes('drive.google.com/file/d/')) {
+        const id = item.image.path.split('/d/')[1].split('/')[0];
+        return {
+          ...item,
+          image: {
+            ...item.image,
+            path: `https://drive.google.com/uc?id=${id}&export=download`,
+          },
+        };
+      }
+      return item;
+    });
+
+    const fixedData = {
+      ...data,
+      resourcesSection: {
+        ...data.resourcesSection,
+        items: resourcesItems,
+      },
+    };
+
     return {
       props: {
-        data: combinedResponse.data,
+        data: fixedData,
         footer: combinedResponse.footer,
       },
     };

@@ -409,6 +409,7 @@ export type LongTermTimeLineResponse = {
 
 export type ResourceItem = {
   title: string;
+  description?: string;
   link: Link;
   image: Image;
 };
@@ -439,7 +440,7 @@ export type MentorshipResourcesResponse = {
     title: string;
   };
   section: {
-    description: string;
+    description?: string;
   };
   resourcesSection: ResourcesSection;
   customStyle?: CustomStyle;

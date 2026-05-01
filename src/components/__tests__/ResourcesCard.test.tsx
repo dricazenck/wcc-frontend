@@ -21,6 +21,7 @@ describe('ResourcesCard', () => {
     expect(screen.getByRole('link', { name: 'Click Me' })).toBeInTheDocument();
 
     const img = screen.getByRole('img');
-    expect(img).toHaveAttribute('src', '/test.jpg');
+    expect(img).toHaveAttribute('src');
+    expect(img.getAttribute('src')).toContain(encodeURIComponent('/test.jpg'));
   });
 });

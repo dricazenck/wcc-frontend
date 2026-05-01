@@ -1,13 +1,13 @@
 import {
   Card,
   CardContent,
-  CardMedia,
   Typography,
   Button,
   CardActions,
   Box,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import Image from 'next/image';
 import React from 'react';
 
 interface ResourcesCardProps {
@@ -45,13 +45,15 @@ export const ResourcesCard: React.FC<ResourcesCardProps> = ({
         },
       }}
     >
-      <CardMedia
-        component="img"
-        height="180"
-        image={image}
-        alt={title}
-        sx={{ objectFit: 'cover' }}
-      />
+      <Box sx={{ position: 'relative', width: '100%', height: 180 }}>
+        <Image
+          src={image}
+          alt={title}
+          fill
+          style={{ objectFit: 'cover' }}
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        />
+      </Box>
 
       <CardContent sx={{ flexGrow: 1 }}>
         <Typography variant="h6" fontWeight="bold" gutterBottom>
@@ -66,6 +68,8 @@ export const ResourcesCard: React.FC<ResourcesCardProps> = ({
         <Button
           variant="contained"
           color="primary"
+          target="_blank"
+          rel="noopener noreferrer"
           href={link}
           sx={{
             textTransform: 'none',
