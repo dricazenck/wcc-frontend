@@ -92,33 +92,29 @@ export const getServerSideProps: GetServerSideProps = async () => {
     );
 
     const data = combinedResponse.data || pageData;
-
-    // fix images path
-    const resourcesItems = data.resourcesSection.items.map((item) => {
-      if (item.image.path.includes('drive.google.com/file/d/')) {
-        const id = item.image.path.split('/d/')[1].split('/')[0];
-        return {
-          ...item,
-          image: {
-            ...item.image,
-            path: `https://drive.google.com/uc?id=${id}&export=download`,
-          },
-        };
-      }
-      return item;
-    });
-
-    const fixedData = {
+    const resourcesData = {
       ...data,
       resourcesSection: {
         ...data.resourcesSection,
-        items: resourcesItems,
+        items: data.resourcesSection.items.map((item) => {
+          if (item.image.path.includes('drive.google.com/file/d/')) {
+            const id = item.image.path.split('/d/')[1].split('/')[0];
+            return {
+              ...item,
+              image: {
+                ...item.image,
+                path: `https://drive.google.com/uc?id=${id}&export=download`,
+              },
+            };
+          }
+          return item;
+        }),
       },
     };
 
     return {
       props: {
-        data: fixedData,
+        data: resourcesData,
         footer: combinedResponse.footer,
       },
     };

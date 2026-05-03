@@ -406,7 +406,6 @@ export type LongTermTimeLineResponse = {
 };
 
 // Types for Mentorship Resources response
-
 export type ResourceItem = {
   title: string;
   description?: string;
